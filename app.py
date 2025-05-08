@@ -1,35 +1,40 @@
 import streamlit as st
 from rag_pipeline.query_engine import query_rag
 
-# Lista de usuários permitidos (ex: login:senha)
+# Lista de usuários permitidos
 USERS = {
-    "Wend": "senha123",
+    "Docinho": "senha123",
     "Sam": "susep2024",
-    # adicione mais se quiser
 }
 
 st.set_page_config(page_title="Agente SUSEP", layout="centered")
 
+# Inicializa o estado de login
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
-st.sidebar.title("🔐 Login")
+if not st.session_state.logged_in:
+    st.sidebar.title("🔐 Login")
 
-username = st.sidebar.text_input("Usuário")
-password = st.sidebar.text_input("Senha", type="password")
+    username = st.sidebar.text_input("Usuário")
+    password = st.sidebar.text_input("Senha", type="password")
+    login_button = st.sidebar.button("Entrar")
 
-if USERS.get(username) != password:
-    st.sidebar.warning("Acesso restrito. Informe credenciais válidas.")
-    st.stop()
+    if login_button:
+        if USERS.get(username) == password:
+            st.session_state.logged_in = True
+            st.session_state.username = username
+            st.rerun()  # <-- força recarregamento da interface após login
+        else:
+            st.sidebar.warning("Acesso restrito. Informe credenciais válidas.")
+    st.stop()  # Impede renderização do conteúdo abaixo se não logado
 
-
-
+# Interface do app (chat)
 st.title("🧠 Agente de IA - Circular SUSEP 648/2021")
-st.write("Faça uma pergunta sobre a Circular SUSEP 648/2021. O agente irá responder com base nos trechos relevantes do documento.")
+st.write(f"Olá **{st.session_state.username}**, faça uma pergunta sobre a Circular SUSEP 648/2021. O agente irá responder com base nos trechos relevantes do documento.")
 
-# Entrada de pergunta do usuário
 user_question = st.text_area("Digite sua pergunta:", height=100)
 
-
-# Quando o botão é clicado, gera a resposta
 if st.button("Enviar"):
     if user_question.strip():
         with st.spinner("Consultando a Circular SUSEP 648..."):
