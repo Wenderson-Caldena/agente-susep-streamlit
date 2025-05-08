@@ -1,0 +1,13 @@
+# Ignore arquivos de ambiente
+.env
+
+# Ignore pastas de cache do Python
+__pycache__/
+*.py[cod]
+
+# Ignore arquivos do VSCode
+.vscode/
+
+# Ignore o diretório de embeddings
+embeddings/
+
